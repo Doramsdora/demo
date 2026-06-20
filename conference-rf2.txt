@@ -1,0 +1,941 @@
+
+logout.php
+<?php
+session_start();
+session_destroy();
+header('Location: index.php');
+exit;
+?>
+
+папка config.php
+database.php
+<?php
+class Database {
+    private $pdo;
+    private static $instance = null;
+    
+    private function __construct() {
+        try {
+            $this->pdo = new PDO("mysql:host=localhost;dbname=conference_rf;charset=utf8", 'root', '');
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            die("Ошибка БД: " . $e->getMessage());
+        }
+    }
+    
+    public static function getInstance() {
+        if (self::$instance === null) self::$instance = new self();
+        return self::$instance;
+    }
+    
+    public function query($sql, $params = []) {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
+    }
+    
+    public function fetchAll($sql, $params = []) {
+        return $this->query($sql, $params)->fetchAll();
+    }
+    
+    public function fetch($sql, $params = []) {
+        return $this->query($sql, $params)->fetch();
+    }
+    
+    public function findUser($login) {
+        return $this->fetch("SELECT * FROM users WHERE login = ?", [$login]);
+    }
+    
+    public function createUser($data) {
+        $this->query("INSERT INTO users (login, password, full_name, phone, email) VALUES (?,?,?,?,?)", 
+            [$data['login'], $data['password'], $data['full_name'], $data['phone'], $data['email']]);
+        return $this->pdo->lastInsertId();
+    }
+    
+    public function getRooms() {
+        return $this->fetchAll("SELECT * FROM rooms ORDER BY name");
+    }
+    
+    public function getBookingsByUser($id) {
+        return $this->fetchAll("SELECT b.*, r.name as room_name FROM bookings b LEFT JOIN rooms r ON b.room_id = r.id WHERE b.user_id = ? ORDER BY b.id DESC", [$id]);
+    }
+    
+    public function getAllBookings() {
+        return $this->fetchAll("SELECT b.*, u.full_name as user_name, r.name as room_name FROM bookings b LEFT JOIN users u ON b.user_id = u.id LEFT JOIN rooms r ON b.room_id = r.id ORDER BY b.id DESC");
+    }
+    
+    public function createBooking($data) {
+        $this->query("INSERT INTO bookings (user_id, room_id, event_date, start_time, payment_method) VALUES (?,?,?,?,?)", 
+            [$data['user_id'], $data['room_id'], $data['event_date'], $data['start_time'], $data['payment_method']]);
+    }
+    
+    public function updateStatus($id, $status) {
+        $this->query("UPDATE bookings SET status = ? WHERE id = ?", [$status, $id]);
+    }
+    
+    public function hasReview($bookingId, $userId) {
+        $r = $this->fetch("SELECT COUNT(*) as cnt FROM reviews WHERE booking_id = ? AND user_id = ?", [$bookingId, $userId]);
+        return $r['cnt'] > 0;
+    }
+    
+    public function addReview($data) {
+        $this->query("INSERT INTO reviews (booking_id, user_id, rating, comment) VALUES (?,?,?,?)", 
+            [$data['booking_id'], $data['user_id'], $data['rating'], $data['comment']]);
+    }
+    
+    public function getUsers() {
+        return $this->fetchAll("SELECT * FROM users ORDER BY id");
+    }
+    
+    public function addRoom($name, $type, $capacity, $price) {
+        $this->query("INSERT INTO rooms (name, type, capacity, price) VALUES (?,?,?,?)", [$name, $type, $capacity, $price]);
+    }
+}
+
+$db = Database::getInstance();
+?>
+
+
+папка css
+style.css
+/* Руководство по стилю */
+/* Цвета: #343A40, #CED4DA, #28A745, #FFFFFF */
+/* Шрифт: Roboto */
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Roboto", Arial, sans-serif;
+  background: #ffffff;
+  color: #343a40;
+  min-height: 100vh;
+}
+
+/* Контейнеры */
+.container {
+  background: #ffffff;
+  padding: 40px;
+  max-width: 480px;
+  margin: 40px auto;
+}
+
+.container-wide {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Заголовки по руководству */
+h1 {
+  font-size: 36px;
+  font-weight: 700;
+  color: #343a40;
+  text-align: center;
+  margin-bottom: 4px;
+  letter-spacing: -0.5px;
+}
+
+h1 .highlight {
+  color: #28a745;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid #28a745;
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #6c757d;
+  font-size: 16px;
+  font-weight: 400;
+  margin-bottom: 24px;
+}
+
+/* Логотип */
+.logo-block {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo-block .logo-placeholder {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  background: #f8f9fa;
+  border: 2px dashed #ced4da;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  font-size: 12px;
+  font-weight: 300;
+}
+
+/* Формы */
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 16px;
+  font-weight: 400;
+  color: #343a40;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #ced4da;
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: "Roboto", Arial, sans-serif;
+  font-weight: 400;
+  color: #343a40;
+  background: #ffffff;
+}
+
+input:focus,
+select:focus {
+  border-color: #28a745;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+/* Кнопки */
+.btn {
+  padding: 12px 28px;
+  background: #28a745;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Roboto", Arial, sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  transition: background 0.2s;
+}
+
+.btn:hover {
+  background: #218838;
+}
+
+.btn-secondary {
+  background: #343a40;
+}
+
+.btn-secondary:hover {
+  background: #23272b;
+}
+
+.btn-danger {
+  background: #dc3545;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #343a40;
+  border: 2px solid #ced4da;
+}
+
+.btn-outline:hover {
+  background: #f8f9fa;
+}
+
+.btn-sm {
+  padding: 6px 16px;
+  font-size: 14px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* Уведомления */
+.alert {
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: 400;
+  display: none;
+}
+
+.alert.show {
+  display: block;
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Карточки */
+.card {
+  background: #ffffff;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid #ced4da;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ced4da;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #343a40;
+}
+
+/* Статусы */
+.status-badge {
+  padding: 4px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 300;
+  text-transform: uppercase;
+}
+
+.status-new {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-assigned {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.status-completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+/* Ссылки */
+.auth-links {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px solid #ced4da;
+}
+
+.auth-links a {
+  color: #28a745;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}
+
+/* Слайдер */
+.slider-container {
+  position: relative;
+  margin: 24px 0;
+  overflow: hidden;
+  border: 1px solid #ced4da;
+}
+
+.slider {
+  display: flex;
+  transition: transform 0.5s;
+}
+
+.slide {
+  min-width: 100%;
+  height: 200px;
+}
+
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(52, 58, 64, 0.7);
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.slider-btn:hover {
+  background: rgba(52, 58, 64, 0.9);
+}
+
+.slider-btn.prev {
+  left: 8px;
+}
+
+.slider-btn.next {
+  right: 8px;
+}
+
+.slider-dots {
+  text-align: center;
+  padding: 12px 0;
+  background: #ffffff;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #ced4da;
+  margin: 0 4px;
+  cursor: pointer;
+}
+
+.dot.active {
+  background: #28a745;
+}
+
+/* Админка */
+.admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.admin-sidebar {
+  width: 240px;
+  background: #343a40;
+  color: #ffffff;
+  padding: 24px 0;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.admin-sidebar .logo {
+  padding: 0 24px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 24px;
+}
+
+.admin-sidebar .logo h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: left;
+  margin: 0;
+}
+
+.admin-sidebar .logo .sub {
+  font-size: 12px;
+  font-weight: 300;
+  color: #ced4da;
+}
+
+.admin-sidebar .logo .logo-placeholder {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ced4da;
+  font-size: 11px;
+  font-weight: 300;
+}
+
+.admin-sidebar .user-info {
+  padding: 0 24px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 24px;
+}
+
+.admin-sidebar .user-info .name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-sidebar .user-info .role {
+  font-size: 12px;
+  font-weight: 300;
+  color: #28a745;
+}
+
+.admin-nav {
+  list-style: none;
+  padding: 0;
+}
+
+.admin-nav li a {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  color: #ced4da;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 400;
+  border-left: 3px solid transparent;
+}
+
+.admin-nav li a:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  border-left-color: #28a745;
+}
+
+.admin-nav li a.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-left-color: #28a745;
+}
+
+.admin-nav li a .icon {
+  margin-right: 12px;
+  font-size: 18px;
+  width: 24px;
+}
+
+.admin-nav li a .badge {
+  margin-left: auto;
+  background: #28a745;
+  color: #ffffff;
+  padding: 1px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.admin-nav .nav-divider {
+  padding: 16px 24px 8px;
+  font-size: 10px;
+  font-weight: 300;
+  color: #6c757d;
+  text-transform: uppercase;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 32px;
+  background: #f8f9fa;
+}
+
+.admin-content .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.admin-content .page-header h2 {
+  border-bottom: none;
+  margin: 0;
+  padding: 0;
+  font-size: 24px;
+}
+
+/* Статистика */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: #ffffff;
+  padding: 20px 24px;
+  border: 1px solid #ced4da;
+  text-align: center;
+}
+
+.stat-card .number {
+  font-size: 30px;
+  font-weight: 700;
+  color: #343a40;
+}
+
+.stat-card .label {
+  font-size: 13px;
+  font-weight: 300;
+  color: #6c757d;
+  margin-top: 4px;
+}
+
+.stat-card.green .number {
+  color: #28a745;
+}
+
+/* Фильтры */
+.admin-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+  background: #ffffff;
+  padding: 16px 20px;
+  border: 1px solid #ced4da;
+}
+
+.admin-filters input,
+.admin-filters select {
+  width: auto;
+  flex: 1;
+  min-width: 140px;
+  padding: 10px 14px;
+}
+
+/* Таблица */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border: 1px solid #ced4da;
+}
+
+.table thead {
+  background: #343a40;
+}
+
+.table th {
+  padding: 14px 18px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #ced4da;
+  font-size: 14px;
+  font-weight: 400;
+  color: #343a40;
+}
+
+.table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+/* Вспомогательные */
+.flex {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-small {
+  font-size: 12px;
+  font-weight: 300;
+  color: #6c757d;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .container {
+    padding: 28px;
+    margin: 20px;
+  }
+
+  h1 {
+    font-size: 30px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .admin-wrapper {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    padding: 16px 0;
+  }
+
+  .admin-sidebar .logo {
+    padding: 0 20px 16px;
+  }
+
+  .admin-sidebar .user-info {
+    padding: 0 20px 16px;
+  }
+
+  .admin-nav {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 12px;
+    gap: 2px;
+  }
+
+  .admin-nav li {
+    flex: 1;
+    min-width: 80px;
+  }
+
+  .admin-nav li a {
+    padding: 10px 14px;
+    font-size: 13px;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    justify-content: center;
+  }
+
+  .admin-nav li a:hover,
+  .admin-nav li a.active {
+    border-left: none;
+    border-bottom-color: #28a745;
+  }
+
+  .admin-nav .nav-divider {
+    display: none;
+  }
+
+  .admin-nav li a .badge {
+    display: none;
+  }
+
+  .admin-content {
+    padding: 16px;
+  }
+
+  .admin-content .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .admin-content .page-header h2 {
+    font-size: 20px;
+  }
+
+  .admin-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-card .number {
+    font-size: 24px;
+  }
+
+  .admin-filters {
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .admin-filters input,
+  .admin-filters select {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .slide {
+    height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 20px;
+    margin: 12px;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+
+  .admin-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .stat-card .number {
+    font-size: 20px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  input,
+  select {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .slide {
+    height: 130px;
+  }
+}
+
+
+
+папка js
+script.js
+class Slider {
+  constructor(id, images) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    this.images = images;
+    this.current = 0;
+
+    let html = '<div class="slider-container"><div class="slider" id="track">';
+    images.forEach((img) => {
+      html += '<div class="slide"><img src="' + img + '" alt=""></div>';
+    });
+    html +=
+      '</div><button class="slider-btn prev" id="prev">‹</button><button class="slider-btn next" id="next">›</button><div class="slider-dots" id="dots"></div></div>';
+    el.innerHTML = html;
+
+    this.track = document.getElementById("track");
+    const dotsContainer = document.getElementById("dots");
+
+    images.forEach((_, i) => {
+      const dot = document.createElement("span");
+      dot.className = "dot" + (i === 0 ? " active" : "");
+      dot.dataset.index = i;
+      dotsContainer.appendChild(dot);
+    });
+
+    this.dots = dotsContainer.querySelectorAll(".dot");
+
+    document
+      .getElementById("prev")
+      .addEventListener("click", () => this.prev());
+    document
+      .getElementById("next")
+      .addEventListener("click", () => this.next());
+    this.dots.forEach((d) => {
+      d.addEventListener("click", () => this.goTo(parseInt(d.dataset.index)));
+    });
+
+    this.interval = setInterval(() => this.next(), 3000);
+  }
+
+  goTo(i) {
+    if (i < 0) i = this.images.length - 1;
+    if (i >= this.images.length) i = 0;
+    this.current = i;
+    this.track.style.transform = "translateX(-" + i * 100 + "%)";
+    this.dots.forEach((d, idx) => {
+      d.className = "dot" + (idx === i ? " active" : "");
+    });
+  }
+
+  prev() {
+    this.goTo(this.current - 1);
+  }
+  next() {
+    this.goTo(this.current + 1);
+  }
+}
+
+
+
+
+
+
+папка img 
+4 фотки 
+1 лого
