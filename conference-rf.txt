@@ -1,0 +1,1859 @@
+бд
+-- phpMyAdmin SQL Dump
+-- version 5.2.0
+-- https://www.phpmyadmin.net/
+--
+-- Хост: 127.0.0.1:3306
+-- Время создания: Июн 20 2026 г., 03:14
+-- Версия сервера: 5.7.39-log
+-- Версия PHP: 8.1.9
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- База данных: `conference_rf`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `bookings`
+--
+
+CREATE TABLE `bookings` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `room_id` int(11) NOT NULL,
+  `event_date` date NOT NULL,
+  `start_time` time NOT NULL,
+  `payment_method` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'Новая'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `bookings`
+--
+
+INSERT INTO `bookings` (`id`, `user_id`, `room_id`, `event_date`, `start_time`, `payment_method`, `status`) VALUES
+(1, 2, 4, '2026-12-12', '11:11:00', 'Наличные', 'Мероприятие завершено');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `reviews`
+--
+
+CREATE TABLE `reviews` (
+  `id` int(11) NOT NULL,
+  `booking_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `rating` int(11) DEFAULT NULL,
+  `comment` text COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `rooms`
+--
+
+CREATE TABLE `rooms` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `capacity` int(11) NOT NULL,
+  `price` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `rooms`
+--
+
+INSERT INTO `rooms` (`id`, `name`, `type`, `capacity`, `price`) VALUES
+(1, 'Зал Академический', 'аудитория', 200, '50000.00'),
+(2, 'Коворкинг Синергия', 'коворкинг', 50, '30000.00'),
+(3, 'Кинозал Премиум', 'кинозал', 100, '45000.00'),
+(4, 'Зал Инноваций', 'аудитория', 150, '40000.00'),
+(5, 'Коворкинг Стартап', 'коворкинг', 30, '20000.00'),
+(6, 'Кинозал Арт', 'кинозал', 80, '35000.00');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `login` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `full_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` enum('user','admin') COLLATE utf8mb4_unicode_ci DEFAULT 'user'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `users`
+--
+
+INSERT INTO `users` (`id`, `login`, `password`, `full_name`, `phone`, `email`, `role`) VALUES
+(1, 'Admin26', 'Demo20', 'Администратор', '+7 (999) 999-99-99', 'admin@mail.ru', 'admin'),
+(2, 'Dora1234', 'Dora1234', 'Дарья Дарья Дарья', '89637270703', 'dora@mpt.ru', 'user');
+
+--
+-- Индексы сохранённых таблиц
+--
+
+--
+-- Индексы таблицы `bookings`
+--
+ALTER TABLE `bookings`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `room_id` (`room_id`);
+
+--
+-- Индексы таблицы `reviews`
+--
+ALTER TABLE `reviews`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `booking_id` (`booking_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Индексы таблицы `rooms`
+--
+ALTER TABLE `rooms`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `login` (`login`);
+
+--
+-- AUTO_INCREMENT для сохранённых таблиц
+--
+
+--
+-- AUTO_INCREMENT для таблицы `bookings`
+--
+ALTER TABLE `bookings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT для таблицы `reviews`
+--
+ALTER TABLE `reviews`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `rooms`
+--
+ALTER TABLE `rooms`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT для таблицы `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- Ограничения внешнего ключа сохраненных таблиц
+--
+
+--
+-- Ограничения внешнего ключа таблицы `bookings`
+--
+ALTER TABLE `bookings`
+  ADD CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `bookings_ibfk_2` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE CASCADE;
+
+--
+-- Ограничения внешнего ключа таблицы `reviews`
+--
+ALTER TABLE `reviews`
+  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+index.php
+<?php session_start(); ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конференции.РФ</title>
+    <link rel="stylesheet" href="css/style.css?v=<?= time() ?>">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            margin: 0;
+            width: 100%;
+            max-width: 480px;
+        }
+        .logo-block img {
+            max-width: 150px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Логотип -->
+        <div class="logo-block">
+            <img src="img/etazhi-logotip-vektor-48.jpg" alt="Логотип Конференции.РФ">
+        </div>
+
+        <h1>Конференции.<span class="highlight">РФ</span></h1>
+        <p class="subtitle">Бронирование помещений для конференций</p>
+        
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <a href="login.php" class="btn" style="flex:1;">Вход</a>
+            <a href="register.php" class="btn btn-secondary" style="flex:1;">Регистрация</a>
+        </div>
+        
+        <div class="auth-links">
+            <span style="color:#6c757d; font-size:12px; font-weight:300;">Администратор: <strong>Admin26</strong> / <strong>Demo20</strong></span>
+        </div>
+    </div>
+</body>
+</html>
+
+
+login.php
+<?php
+require_once 'config/database.php';
+session_start();
+
+$error = '';
+
+if ($_POST) {
+    $login = trim($_POST['login']);
+    $password = $_POST['password'];
+    
+    $user = $db->findUser($login);
+    
+    if (!$user) {
+        $error = 'Пользователь не найден';
+    } elseif ($user['password'] !== $password) {
+        $error = 'Неверный пароль';
+    } else {
+        $_SESSION['user'] = $user;
+        header('Location: ' . ($user['role'] === 'admin' ? 'admin.php' : 'profile.php'));
+        exit;
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход</title>
+    <link rel="stylesheet" href="css/style.css?v=<?= time() ?>">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #FFFFFF;
+        }
+        .container {
+            margin: 0;
+            width: 100%;
+            max-width: 420px;
+        }
+        .logo-block img {
+            max-width: 120px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Логотип -->
+        <div class="logo-block">
+            <img src="img/etazhi-logotip-vektor-48.jpg" alt="Логотип">
+        </div>
+
+        <h1>Вход</h1>
+        <p class="subtitle">Войдите в свой аккаунт</p>
+        
+        <?php if ($error): ?>
+            <div class="alert alert-error show"><?= $error ?></div>
+        <?php endif; ?>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>Логин</label>
+                <input type="text" name="login" placeholder="Введите логин" required>
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" name="password" placeholder="Введите пароль" required>
+            </div>
+            <button type="submit" class="btn btn-block">Войти</button>
+        </form>
+        
+        <div class="auth-links">
+            <a href="register.php">Нет аккаунта? Регистрация</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+register.php
+<?php
+require_once 'config/database.php';
+session_start();
+
+$error = $success = '';
+
+if ($_POST) {
+    $login = trim($_POST['login']);
+    $password = $_POST['password'];
+    $full_name = trim($_POST['full_name']);
+    $phone = trim($_POST['phone']);
+    $email = trim($_POST['email']);
+    
+    if (strlen($login) < 6 || !preg_match('/^[A-Za-z0-9]+$/', $login)) {
+        $error = 'Логин: латиница, мин. 6 символов';
+    } elseif (strlen($password) < 8) {
+        $error = 'Пароль: мин. 8 символов';
+    } elseif (strlen($full_name) < 2) {
+        $error = 'Введите ФИО';
+    } elseif (strlen($phone) < 10) {
+        $error = 'Введите телефон';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Введите email';
+    } elseif ($db->findUser($login)) {
+        $error = 'Логин занят';
+    } else {
+        $db->createUser(compact('login','password','full_name','phone','email'));
+        $success = 'Регистрация успешна!';
+        header('Refresh: 2; url=login.php');
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="css/style.css?v=<?= time() ?>">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #FFFFFF;
+        }
+        .container {
+            margin: 0;
+            width: 100%;
+            max-width: 420px;
+        }
+        .logo-block img {
+            max-width: 120px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Логотип -->
+        <div class="logo-block">
+            <img src="img/etazhi-logotip-vektor-48.jpg" alt="Логотип">
+        </div>
+
+        <h1>Регистрация</h1>
+        <p class="subtitle">Создайте новый аккаунт</p>
+        
+        <?php if ($error): ?>
+            <div class="alert alert-error show"><?= $error ?></div>
+        <?php endif; ?>
+        <?php if ($success): ?>
+            <div class="alert alert-success show"><?= $success ?></div>
+        <?php endif; ?>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>Логин *</label>
+                <input type="text" name="login" placeholder="Латиница, мин. 6 символов" required>
+            </div>
+            <div class="form-group">
+                <label>Пароль *</label>
+                <input type="password" name="password" placeholder="Мин. 8 символов" required>
+            </div>
+            <div class="form-group">
+                <label>ФИО *</label>
+                <input type="text" name="full_name" placeholder="Иванов Иван Иванович" required>
+            </div>
+            <div class="form-group">
+                <label>Телефон *</label>
+                <input type="tel" name="phone" placeholder="+7 (999) 999-99-99" required>
+            </div>
+            <div class="form-group">
+                <label>Email *</label>
+                <input type="email" name="email" placeholder="mail@example.ru" required>
+            </div>
+            <button type="submit" class="btn btn-block">Зарегистрироваться</button>
+        </form>
+        
+        <div class="auth-links">
+            <a href="login.php">Уже есть аккаунт? Войти</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+profile.php
+<?php
+require_once 'config/database.php';
+session_start();
+
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$user = $_SESSION['user'];
+$bookings = $db->getBookingsByUser($user['id']);
+
+if ($_POST && isset($_POST['add_review'])) {
+    $db->addReview([
+        'booking_id' => $_POST['booking_id'],
+        'user_id' => $user['id'],
+        'rating' => $_POST['rating'],
+        'comment' => $_POST['comment']
+    ]);
+    header('Location: profile.php');
+    exit;
+}
+
+function statusClass($s) {
+    $map = ['Новая' => 'new', 'Мероприятие назначено' => 'assigned', 'Мероприятие завершено' => 'completed'];
+    return $map[$s] ?? 'new';
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет</title>
+    <link rel="stylesheet" href="css/style.css?v=<?= time() ?>">
+    <style>
+        .logo-block img {
+            max-width: 120px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width:700px;">
+        <!-- Логотип -->
+        <div class="logo-block">
+            <img src="img/etazhi-logotip-vektor-48.jpg" alt="Логотип">
+        </div>
+
+        <div class="flex-between">
+            <h1 style="font-size:30px; margin:0;">Личный кабинет</h1>
+            <a href="logout.php" class="btn btn-danger btn-sm">Выход</a>
+        </div>
+        
+        <div style="margin:16px 0 24px;">
+            <p style="font-size:16px; font-weight:400;"><?= htmlspecialchars($user['full_name']) ?></p>
+            <p class="text-small"><?= htmlspecialchars($user['email']) ?></p>
+        </div>
+        
+        <div id="slider"></div>
+        
+        <h2>Мои заявки</h2>
+        
+        <?php if (empty($bookings)): ?>
+            <div class="card" style="text-align:center; padding:40px;">
+                <p style="color:#6c757d; font-size:16px;">У вас пока нет заявок</p>
+                <a href="booking.php" class="btn" style="margin-top:16px;">Создать заявку</a>
+            </div>
+        <?php else: ?>
+            <?php foreach ($bookings as $b): ?>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Заявка №<?= $b['id'] ?></span>
+                        <span class="status-badge status-<?= statusClass($b['status']) ?>"><?= $b['status'] ?></span>
+                    </div>
+                    <div>
+                        <p><strong>Помещение:</strong> <?= htmlspecialchars($b['room_name']) ?></p>
+                        <p><strong>Дата:</strong> <?= $b['event_date'] ?> в <?= $b['start_time'] ?></p>
+                        <p><strong>Оплата:</strong> <?= $b['payment_method'] ?></p>
+                        
+                        <?php if ($b['status'] === 'Мероприятие завершено' && !$db->hasReview($b['id'], $user['id'])): ?>
+                            <form method="POST" style="margin-top:12px;">
+                                <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
+                                <div class="flex-center">
+                                    <select name="rating" style="width:auto; padding:8px 12px;">
+                                        <option value="5">5</option>
+                                        <option value="4">4</option>
+                                        <option value="3">3</option>
+                                        <option value="2">2</option>
+                                        <option value="1">1</option>
+                                    </select>
+                                    <input type="text" name="comment" placeholder="Ваш отзыв" style="flex:1;" required>
+                                    <button type="submit" name="add_review" class="btn btn-secondary btn-sm">Отзыв</button>
+                                </div>
+                            </form>
+                        <?php elseif ($b['status'] === 'Мероприятие завершено'): ?>
+                            <p style="color:#28A745; margin-top:8px; font-weight:600;">Отзыв оставлен</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        
+        <div class="text-center mt-20">
+            <a href="booking.php" class="btn">Новая заявка</a>
+        </div>
+    </div>
+
+    <script src="js/script.js?v=<?= time() ?>"></script>
+    <script>
+        new Slider('slider', [
+            'img/image (1).jpeg',
+            'img/image (2).jpeg',
+            'img/image (3).jpeg',
+            'img/image (4).jpeg'
+        ]);
+    </script>
+</body>
+</html>
+
+
+
+admin.php
+<?php
+require_once 'config/database.php';
+session_start();
+
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+    header('Location: login.php');
+    exit;
+}
+
+$user = $_SESSION['user'];
+$tab = $_GET['tab'] ?? 'dashboard';
+$bookings = $db->getAllBookings();
+$users = $db->getUsers();
+$rooms = $db->getRooms();
+
+$new = $assigned = $completed = 0;
+foreach ($bookings as $b) {
+    if ($b['status'] === 'Новая') $new++;
+    elseif ($b['status'] === 'Мероприятие назначено') $assigned++;
+    elseif ($b['status'] === 'Мероприятие завершено') $completed++;
+}
+
+if ($_POST) {
+    if (isset($_POST['update_status'])) {
+        $db->updateStatus($_POST['booking_id'], $_POST['status']);
+        header('Location: admin.php?tab=bookings');
+        exit;
+    }
+    if (isset($_POST['add_room'])) {
+        $db->addRoom($_POST['name'], $_POST['type'], $_POST['capacity'], $_POST['price']);
+        header('Location: admin.php?tab=rooms');
+        exit;
+    }
+}
+
+function sClass($s) {
+    $map = ['Новая' => 'new', 'Мероприятие назначено' => 'assigned', 'Мероприятие завершено' => 'completed'];
+    return $map[$s] ?? 'new';
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель</title>
+    <link rel="stylesheet" href="css/style.css?v=<?= time() ?>">
+    <style>
+        .admin-sidebar .logo img {
+            max-width: 80px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <div class="logo">
+                <img src="img/etazhi-logotip-vektor-48.jpg" alt="Логотип">
+                <h1>Конференции</h1>
+                <div class="sub">Панель управления</div>
+            </div>
+            <div class="user-info">
+                <div class="name"><?= htmlspecialchars($user['full_name']) ?></div>
+                <div class="role">Администратор</div>
+            </div>
+            <ul class="admin-nav">
+                <li class="nav-divider">Навигация</li>
+                <li><a href="admin.php?tab=dashboard" class="<?= $tab === 'dashboard' ? 'active' : '' ?>"><span class="icon">◆</span> Панель</a></li>
+                <li><a href="admin.php?tab=bookings" class="<?= $tab === 'bookings' ? 'active' : '' ?>"><span class="icon">◇</span> Заявки <span class="badge"><?= $new ?></span></a></li>
+                <li><a href="admin.php?tab=rooms" class="<?= $tab === 'rooms' ? 'active' : '' ?>"><span class="icon">□</span> Помещения</a></li>
+                <li><a href="admin.php?tab=users" class="<?= $tab === 'users' ? 'active' : '' ?>"><span class="icon">○</span> Пользователи</a></li>
+                <li class="nav-divider">Система</li>
+                <li><a href="logout.php"><span class="icon">╳</span> Выход</a></li>
+            </ul>
+        </aside>
+        
+        <main class="admin-content">
+            <div class="page-header">
+                <h2><?= ['dashboard' => 'Панель управления', 'bookings' => 'Управление заявками', 'rooms' => 'Управление помещениями', 'users' => 'Пользователи'][$tab] ?></h2>
+                <span class="text-small"><?= date('d.m.Y H:i') ?></span>
+            </div>
+            
+            <?php if ($tab === 'dashboard'): ?>
+                <div class="admin-stats">
+                    <div class="stat-card green"><div class="number"><?= count($bookings) ?></div><div class="label">Всего заявок</div></div>
+                    <div class="stat-card"><div class="number"><?= $new ?></div><div class="label">Новые</div></div>
+                    <div class="stat-card"><div class="number"><?= $assigned ?></div><div class="label">Назначено</div></div>
+                    <div class="stat-card"><div class="number"><?= $completed ?></div><div class="label">Завершено</div></div>
+                </div>
+                
+                <h3>Последние заявки</h3>
+                <?php foreach (array_slice($bookings, 0, 5) as $b): ?>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Заявка №<?= $b['id'] ?> — <?= htmlspecialchars($b['user_name']) ?></span>
+                            <span class="status-badge status-<?= sClass($b['status']) ?>"><?= $b['status'] ?></span>
+                        </div>
+                        <div><strong>Помещение:</strong> <?= htmlspecialchars($b['room_name']) ?> | <strong>Дата:</strong> <?= $b['event_date'] ?></div>
+                    </div>
+                <?php endforeach; ?>
+                
+            <?php elseif ($tab === 'bookings'): ?>
+                <div class="admin-filters">
+                    <input type="text" id="search" placeholder="Поиск..." onkeyup="filterTable()">
+                    <select id="statusFilter" onchange="filterTable()">
+                        <option value="all">Все статусы</option>
+                        <option value="Новая">Новая</option>
+                        <option value="Мероприятие назначено">Назначено</option>
+                        <option value="Мероприятие завершено">Завершено</option>
+                    </select>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table" id="bookingsTable">
+                        <thead><tr><th>ID</th><th>Пользователь</th><th>Помещение</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead>
+                        <tbody>
+                            <?php foreach ($bookings as $b): ?>
+                                <tr data-status="<?= $b['status'] ?>">
+                                    <td>#<?= $b['id'] ?></td>
+                                    <td><?= htmlspecialchars($b['user_name']) ?></td>
+                                    <td><?= htmlspecialchars($b['room_name']) ?></td>
+                                    <td><?= $b['event_date'] ?></td>
+                                    <td><span class="status-badge status-<?= sClass($b['status']) ?>"><?= $b['status'] ?></span></td>
+                                    <td>
+                                        <form method="POST" style="display:flex; gap:6px; flex-wrap:wrap;">
+                                            <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
+                                            <select name="status" style="width:auto; padding:4px 8px; font-size:13px;">
+                                                <option value="Новая" <?= $b['status'] === 'Новая' ? 'selected' : '' ?>>Новая</option>
+                                                <option value="Мероприятие назначено" <?= $b['status'] === 'Мероприятие назначено' ? 'selected' : '' ?>>Назначено</option>
+                                                <option value="Мероприятие завершено" <?= $b['status'] === 'Мероприятие завершено' ? 'selected' : '' ?>>Завершено</option>
+                                            </select>
+                                            <button type="submit" name="update_status" class="btn btn-secondary btn-sm">Обновить</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                
+            <?php elseif ($tab === 'rooms'): ?>
+                <div class="card" style="margin-bottom:24px;">
+                    <h3>Добавить помещение</h3>
+                    <form method="POST" style="display:flex; gap:12px; flex-wrap:wrap; align-items:end;">
+                        <div class="form-group" style="margin:0; flex:2; min-width:140px;">
+                            <label style="font-size:13px; font-weight:400;">Название</label>
+                            <input type="text" name="name" placeholder="Название" required style="padding:8px 12px;">
+                        </div>
+                        <div class="form-group" style="margin:0; flex:1; min-width:100px;">
+                            <label style="font-size:13px; font-weight:400;">Тип</label>
+                            <select name="type" required style="padding:8px 12px;">
+                                <option value="аудитория">Аудитория</option>
+                                <option value="коворкинг">Коворкинг</option>
+                                <option value="кинозал">Кинозал</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin:0; flex:0 0 90px;">
+                            <label style="font-size:13px; font-weight:400;">Вместимость</label>
+                            <input type="number" name="capacity" placeholder="50" required style="padding:8px 12px;">
+                        </div>
+                        <div class="form-group" style="margin:0; flex:0 0 110px;">
+                            <label style="font-size:13px; font-weight:400;">Цена (руб.)</label>
+                            <input type="number" name="price" placeholder="30000" required style="padding:8px 12px;">
+                        </div>
+                        <button type="submit" name="add_room" class="btn">Добавить</button>
+                    </form>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead><tr><th>ID</th><th>Название</th><th>Тип</th><th>Вместимость</th><th>Цена</th></tr></thead>
+                        <tbody>
+                            <?php foreach ($rooms as $r): ?>
+                                <tr>
+                                    <td>#<?= $r['id'] ?></td>
+                                    <td><?= htmlspecialchars($r['name']) ?></td>
+                                    <td><?= $r['type'] ?></td>
+                                    <td><?= $r['capacity'] ?></td>
+                                    <td><?= number_format($r['price'], 0, ',', ' ') ?> ₽</td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                
+            <?php elseif ($tab === 'users'): ?>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead><tr><th>ID</th><th>Логин</th><th>ФИО</th><th>Телефон</th><th>Email</th><th>Роль</th></tr></thead>
+                        <tbody>
+                            <?php foreach ($users as $u): ?>
+                                <tr>
+                                    <td>#<?= $u['id'] ?></td>
+                                    <td><?= htmlspecialchars($u['login']) ?></td>
+                                    <td><?= htmlspecialchars($u['full_name']) ?></td>
+                                    <td><?= htmlspecialchars($u['phone']) ?></td>
+                                    <td><?= htmlspecialchars($u['email']) ?></td>
+                                    <td><span class="status-badge <?= $u['role'] === 'admin' ? 'status-assigned' : 'status-new' ?>"><?= $u['role'] === 'admin' ? 'Админ' : 'Пользователь' ?></span></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </main>
+    </div>
+
+    <script>
+    function filterTable() {
+        const search = document.getElementById('search').value.toLowerCase();
+        const status = document.getElementById('statusFilter').value;
+        document.querySelectorAll('#bookingsTable tbody tr').forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const s = row.dataset.status;
+            row.style.display = (search && !text.includes(search) || status !== 'all' && s !== status) ? 'none' : '';
+        });
+    }
+    </script>
+</body>
+</html>
+
+
+booking.php
+<?php
+require_once 'config/database.php';
+session_start();
+
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$rooms = $db->getRooms();
+$error = $success = '';
+
+if ($_POST) {
+    $room_id = $_POST['room_id'];
+    $event_date = $_POST['event_date'];
+    $start_time = $_POST['start_time'];
+    $payment_method = $_POST['payment_method'];
+    
+    if (!$room_id || !$event_date || !$start_time || !$payment_method) {
+        $error = 'Заполните все поля';
+    } else {
+        $db->createBooking([
+            'user_id' => $_SESSION['user']['id'],
+            'room_id' => $room_id,
+            'event_date' => $event_date,
+            'start_time' => $start_time,
+            'payment_method' => $payment_method
+        ]);
+        $success = 'Заявка создана!';
+        header('Refresh: 2; url=profile.php');
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новая заявка</title>
+    <link rel="stylesheet" href="css/style.css?v=<?= time() ?>">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #FFFFFF;
+        }
+        .container {
+            margin: 0;
+            width: 100%;
+            max-width: 480px;
+        }
+        .logo-block img {
+            max-width: 100px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Логотип -->
+        <div class="logo-block">
+            <img src="img/etazhi-logotip-vektor-48.jpg" alt="Логотип">
+        </div>
+
+        <div class="flex-between">
+            <h1 style="font-size:24px; margin:0;">Новая заявка</h1>
+            <a href="profile.php" class="btn btn-outline btn-sm">Назад</a>
+        </div>
+        
+        <?php if ($error): ?>
+            <div class="alert alert-error show"><?= $error ?></div>
+        <?php endif; ?>
+        <?php if ($success): ?>
+            <div class="alert alert-success show"><?= $success ?></div>
+        <?php endif; ?>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>Помещение *</label>
+                <select name="room_id" required>
+                    <option value="">Выберите помещение</option>
+                    <?php foreach ($rooms as $r): ?>
+                        <option value="<?= $r['id'] ?>"><?= $r['name'] ?> (<?= $r['type'] ?>)</option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Дата *</label>
+                <input type="date" name="event_date" min="<?= date('Y-m-d') ?>" required>
+            </div>
+            <div class="form-group">
+                <label>Время *</label>
+                <input type="time" name="start_time" required>
+            </div>
+            <div class="form-group">
+                <label>Оплата *</label>
+                <select name="payment_method" required>
+                    <option value="">Выберите способ</option>
+                    <option value="Наличные">Наличные</option>
+                    <option value="Банковская карта">Банковская карта</option>
+                    <option value="Безналичный расчет">Безналичный расчет</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-block">Отправить заявку</button>
+        </form>
+    </div>
+</body>
+</html>
+
+
+
+logout.php
+<?php
+session_start();
+session_destroy();
+header('Location: index.php');
+exit;
+?>
+
+папка config.php
+database.php
+<?php
+class Database {
+    private $pdo;
+    private static $instance = null;
+    
+    private function __construct() {
+        try {
+            $this->pdo = new PDO("mysql:host=localhost;dbname=conference_rf;charset=utf8", 'root', '');
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            die("Ошибка БД: " . $e->getMessage());
+        }
+    }
+    
+    public static function getInstance() {
+        if (self::$instance === null) self::$instance = new self();
+        return self::$instance;
+    }
+    
+    public function query($sql, $params = []) {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
+    }
+    
+    public function fetchAll($sql, $params = []) {
+        return $this->query($sql, $params)->fetchAll();
+    }
+    
+    public function fetch($sql, $params = []) {
+        return $this->query($sql, $params)->fetch();
+    }
+    
+    public function findUser($login) {
+        return $this->fetch("SELECT * FROM users WHERE login = ?", [$login]);
+    }
+    
+    public function createUser($data) {
+        $this->query("INSERT INTO users (login, password, full_name, phone, email) VALUES (?,?,?,?,?)", 
+            [$data['login'], $data['password'], $data['full_name'], $data['phone'], $data['email']]);
+        return $this->pdo->lastInsertId();
+    }
+    
+    public function getRooms() {
+        return $this->fetchAll("SELECT * FROM rooms ORDER BY name");
+    }
+    
+    public function getBookingsByUser($id) {
+        return $this->fetchAll("SELECT b.*, r.name as room_name FROM bookings b LEFT JOIN rooms r ON b.room_id = r.id WHERE b.user_id = ? ORDER BY b.id DESC", [$id]);
+    }
+    
+    public function getAllBookings() {
+        return $this->fetchAll("SELECT b.*, u.full_name as user_name, r.name as room_name FROM bookings b LEFT JOIN users u ON b.user_id = u.id LEFT JOIN rooms r ON b.room_id = r.id ORDER BY b.id DESC");
+    }
+    
+    public function createBooking($data) {
+        $this->query("INSERT INTO bookings (user_id, room_id, event_date, start_time, payment_method) VALUES (?,?,?,?,?)", 
+            [$data['user_id'], $data['room_id'], $data['event_date'], $data['start_time'], $data['payment_method']]);
+    }
+    
+    public function updateStatus($id, $status) {
+        $this->query("UPDATE bookings SET status = ? WHERE id = ?", [$status, $id]);
+    }
+    
+    public function hasReview($bookingId, $userId) {
+        $r = $this->fetch("SELECT COUNT(*) as cnt FROM reviews WHERE booking_id = ? AND user_id = ?", [$bookingId, $userId]);
+        return $r['cnt'] > 0;
+    }
+    
+    public function addReview($data) {
+        $this->query("INSERT INTO reviews (booking_id, user_id, rating, comment) VALUES (?,?,?,?)", 
+            [$data['booking_id'], $data['user_id'], $data['rating'], $data['comment']]);
+    }
+    
+    public function getUsers() {
+        return $this->fetchAll("SELECT * FROM users ORDER BY id");
+    }
+    
+    public function addRoom($name, $type, $capacity, $price) {
+        $this->query("INSERT INTO rooms (name, type, capacity, price) VALUES (?,?,?,?)", [$name, $type, $capacity, $price]);
+    }
+}
+
+$db = Database::getInstance();
+?>
+
+
+папка css
+style.css
+/* Руководство по стилю */
+/* Цвета: #343A40, #CED4DA, #28A745, #FFFFFF */
+/* Шрифт: Roboto */
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Roboto", Arial, sans-serif;
+  background: #ffffff;
+  color: #343a40;
+  min-height: 100vh;
+}
+
+/* Контейнеры */
+.container {
+  background: #ffffff;
+  padding: 40px;
+  max-width: 480px;
+  margin: 40px auto;
+}
+
+.container-wide {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Заголовки по руководству */
+h1 {
+  font-size: 36px;
+  font-weight: 700;
+  color: #343a40;
+  text-align: center;
+  margin-bottom: 4px;
+  letter-spacing: -0.5px;
+}
+
+h1 .highlight {
+  color: #28a745;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid #28a745;
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #6c757d;
+  font-size: 16px;
+  font-weight: 400;
+  margin-bottom: 24px;
+}
+
+/* Логотип */
+.logo-block {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo-block .logo-placeholder {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  background: #f8f9fa;
+  border: 2px dashed #ced4da;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  font-size: 12px;
+  font-weight: 300;
+}
+
+/* Формы */
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 16px;
+  font-weight: 400;
+  color: #343a40;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #ced4da;
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: "Roboto", Arial, sans-serif;
+  font-weight: 400;
+  color: #343a40;
+  background: #ffffff;
+}
+
+input:focus,
+select:focus {
+  border-color: #28a745;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+/* Кнопки */
+.btn {
+  padding: 12px 28px;
+  background: #28a745;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Roboto", Arial, sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  transition: background 0.2s;
+}
+
+.btn:hover {
+  background: #218838;
+}
+
+.btn-secondary {
+  background: #343a40;
+}
+
+.btn-secondary:hover {
+  background: #23272b;
+}
+
+.btn-danger {
+  background: #dc3545;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #343a40;
+  border: 2px solid #ced4da;
+}
+
+.btn-outline:hover {
+  background: #f8f9fa;
+}
+
+.btn-sm {
+  padding: 6px 16px;
+  font-size: 14px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* Уведомления */
+.alert {
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: 400;
+  display: none;
+}
+
+.alert.show {
+  display: block;
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Карточки */
+.card {
+  background: #ffffff;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid #ced4da;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ced4da;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #343a40;
+}
+
+/* Статусы */
+.status-badge {
+  padding: 4px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 300;
+  text-transform: uppercase;
+}
+
+.status-new {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-assigned {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.status-completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+/* Ссылки */
+.auth-links {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px solid #ced4da;
+}
+
+.auth-links a {
+  color: #28a745;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}
+
+/* Слайдер */
+.slider-container {
+  position: relative;
+  margin: 24px 0;
+  overflow: hidden;
+  border: 1px solid #ced4da;
+}
+
+.slider {
+  display: flex;
+  transition: transform 0.5s;
+}
+
+.slide {
+  min-width: 100%;
+  height: 200px;
+}
+
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(52, 58, 64, 0.7);
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.slider-btn:hover {
+  background: rgba(52, 58, 64, 0.9);
+}
+
+.slider-btn.prev {
+  left: 8px;
+}
+
+.slider-btn.next {
+  right: 8px;
+}
+
+.slider-dots {
+  text-align: center;
+  padding: 12px 0;
+  background: #ffffff;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #ced4da;
+  margin: 0 4px;
+  cursor: pointer;
+}
+
+.dot.active {
+  background: #28a745;
+}
+
+/* Админка */
+.admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.admin-sidebar {
+  width: 240px;
+  background: #343a40;
+  color: #ffffff;
+  padding: 24px 0;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.admin-sidebar .logo {
+  padding: 0 24px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 24px;
+}
+
+.admin-sidebar .logo h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: left;
+  margin: 0;
+}
+
+.admin-sidebar .logo .sub {
+  font-size: 12px;
+  font-weight: 300;
+  color: #ced4da;
+}
+
+.admin-sidebar .logo .logo-placeholder {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ced4da;
+  font-size: 11px;
+  font-weight: 300;
+}
+
+.admin-sidebar .user-info {
+  padding: 0 24px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 24px;
+}
+
+.admin-sidebar .user-info .name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-sidebar .user-info .role {
+  font-size: 12px;
+  font-weight: 300;
+  color: #28a745;
+}
+
+.admin-nav {
+  list-style: none;
+  padding: 0;
+}
+
+.admin-nav li a {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  color: #ced4da;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 400;
+  border-left: 3px solid transparent;
+}
+
+.admin-nav li a:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  border-left-color: #28a745;
+}
+
+.admin-nav li a.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-left-color: #28a745;
+}
+
+.admin-nav li a .icon {
+  margin-right: 12px;
+  font-size: 18px;
+  width: 24px;
+}
+
+.admin-nav li a .badge {
+  margin-left: auto;
+  background: #28a745;
+  color: #ffffff;
+  padding: 1px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.admin-nav .nav-divider {
+  padding: 16px 24px 8px;
+  font-size: 10px;
+  font-weight: 300;
+  color: #6c757d;
+  text-transform: uppercase;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 32px;
+  background: #f8f9fa;
+}
+
+.admin-content .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.admin-content .page-header h2 {
+  border-bottom: none;
+  margin: 0;
+  padding: 0;
+  font-size: 24px;
+}
+
+/* Статистика */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: #ffffff;
+  padding: 20px 24px;
+  border: 1px solid #ced4da;
+  text-align: center;
+}
+
+.stat-card .number {
+  font-size: 30px;
+  font-weight: 700;
+  color: #343a40;
+}
+
+.stat-card .label {
+  font-size: 13px;
+  font-weight: 300;
+  color: #6c757d;
+  margin-top: 4px;
+}
+
+.stat-card.green .number {
+  color: #28a745;
+}
+
+/* Фильтры */
+.admin-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+  background: #ffffff;
+  padding: 16px 20px;
+  border: 1px solid #ced4da;
+}
+
+.admin-filters input,
+.admin-filters select {
+  width: auto;
+  flex: 1;
+  min-width: 140px;
+  padding: 10px 14px;
+}
+
+/* Таблица */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border: 1px solid #ced4da;
+}
+
+.table thead {
+  background: #343a40;
+}
+
+.table th {
+  padding: 14px 18px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #ced4da;
+  font-size: 14px;
+  font-weight: 400;
+  color: #343a40;
+}
+
+.table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+/* Вспомогательные */
+.flex {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-small {
+  font-size: 12px;
+  font-weight: 300;
+  color: #6c757d;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .container {
+    padding: 28px;
+    margin: 20px;
+  }
+
+  h1 {
+    font-size: 30px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .admin-wrapper {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    padding: 16px 0;
+  }
+
+  .admin-sidebar .logo {
+    padding: 0 20px 16px;
+  }
+
+  .admin-sidebar .user-info {
+    padding: 0 20px 16px;
+  }
+
+  .admin-nav {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 12px;
+    gap: 2px;
+  }
+
+  .admin-nav li {
+    flex: 1;
+    min-width: 80px;
+  }
+
+  .admin-nav li a {
+    padding: 10px 14px;
+    font-size: 13px;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    justify-content: center;
+  }
+
+  .admin-nav li a:hover,
+  .admin-nav li a.active {
+    border-left: none;
+    border-bottom-color: #28a745;
+  }
+
+  .admin-nav .nav-divider {
+    display: none;
+  }
+
+  .admin-nav li a .badge {
+    display: none;
+  }
+
+  .admin-content {
+    padding: 16px;
+  }
+
+  .admin-content .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .admin-content .page-header h2 {
+    font-size: 20px;
+  }
+
+  .admin-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-card .number {
+    font-size: 24px;
+  }
+
+  .admin-filters {
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .admin-filters input,
+  .admin-filters select {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .slide {
+    height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 20px;
+    margin: 12px;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+
+  .admin-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .stat-card .number {
+    font-size: 20px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  input,
+  select {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .slide {
+    height: 130px;
+  }
+}
+
+
+
+папка js
+script.js
+class Slider {
+  constructor(id, images) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    this.images = images;
+    this.current = 0;
+
+    let html = '<div class="slider-container"><div class="slider" id="track">';
+    images.forEach((img) => {
+      html += '<div class="slide"><img src="' + img + '" alt=""></div>';
+    });
+    html +=
+      '</div><button class="slider-btn prev" id="prev">‹</button><button class="slider-btn next" id="next">›</button><div class="slider-dots" id="dots"></div></div>';
+    el.innerHTML = html;
+
+    this.track = document.getElementById("track");
+    const dotsContainer = document.getElementById("dots");
+
+    images.forEach((_, i) => {
+      const dot = document.createElement("span");
+      dot.className = "dot" + (i === 0 ? " active" : "");
+      dot.dataset.index = i;
+      dotsContainer.appendChild(dot);
+    });
+
+    this.dots = dotsContainer.querySelectorAll(".dot");
+
+    document
+      .getElementById("prev")
+      .addEventListener("click", () => this.prev());
+    document
+      .getElementById("next")
+      .addEventListener("click", () => this.next());
+    this.dots.forEach((d) => {
+      d.addEventListener("click", () => this.goTo(parseInt(d.dataset.index)));
+    });
+
+    this.interval = setInterval(() => this.next(), 3000);
+  }
+
+  goTo(i) {
+    if (i < 0) i = this.images.length - 1;
+    if (i >= this.images.length) i = 0;
+    this.current = i;
+    this.track.style.transform = "translateX(-" + i * 100 + "%)";
+    this.dots.forEach((d, idx) => {
+      d.className = "dot" + (idx === i ? " active" : "");
+    });
+  }
+
+  prev() {
+    this.goTo(this.current - 1);
+  }
+  next() {
+    this.goTo(this.current + 1);
+  }
+}
+
+
+
+
+
+
+папка img 
+4 фотки 
+1 лого
