@@ -1,0 +1,916 @@
+бд
+-- phpMyAdmin SQL Dump
+-- version 5.2.0
+-- https://www.phpmyadmin.net/
+--
+-- Хост: 127.0.0.1:3306
+-- Время создания: Июн 20 2026 г., 03:14
+-- Версия сервера: 5.7.39-log
+-- Версия PHP: 8.1.9
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- База данных: `conference_rf`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `bookings`
+--
+
+CREATE TABLE `bookings` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `room_id` int(11) NOT NULL,
+  `event_date` date NOT NULL,
+  `start_time` time NOT NULL,
+  `payment_method` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'Новая'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `bookings`
+--
+
+INSERT INTO `bookings` (`id`, `user_id`, `room_id`, `event_date`, `start_time`, `payment_method`, `status`) VALUES
+(1, 2, 4, '2026-12-12', '11:11:00', 'Наличные', 'Мероприятие завершено');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `reviews`
+--
+
+CREATE TABLE `reviews` (
+  `id` int(11) NOT NULL,
+  `booking_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `rating` int(11) DEFAULT NULL,
+  `comment` text COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `rooms`
+--
+
+CREATE TABLE `rooms` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `capacity` int(11) NOT NULL,
+  `price` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `rooms`
+--
+
+INSERT INTO `rooms` (`id`, `name`, `type`, `capacity`, `price`) VALUES
+(1, 'Зал Академический', 'аудитория', 200, '50000.00'),
+(2, 'Коворкинг Синергия', 'коворкинг', 50, '30000.00'),
+(3, 'Кинозал Премиум', 'кинозал', 100, '45000.00'),
+(4, 'Зал Инноваций', 'аудитория', 150, '40000.00'),
+(5, 'Коворкинг Стартап', 'коворкинг', 30, '20000.00'),
+(6, 'Кинозал Арт', 'кинозал', 80, '35000.00');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `login` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `full_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` enum('user','admin') COLLATE utf8mb4_unicode_ci DEFAULT 'user'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `users`
+--
+
+INSERT INTO `users` (`id`, `login`, `password`, `full_name`, `phone`, `email`, `role`) VALUES
+(1, 'Admin26', 'Demo20', 'Администратор', '+7 (999) 999-99-99', 'admin@mail.ru', 'admin'),
+(2, 'Dora1234', 'Dora1234', 'Дарья Дарья Дарья', '89637270703', 'dora@mpt.ru', 'user');
+
+--
+-- Индексы сохранённых таблиц
+--
+
+--
+-- Индексы таблицы `bookings`
+--
+ALTER TABLE `bookings`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `room_id` (`room_id`);
+
+--
+-- Индексы таблицы `reviews`
+--
+ALTER TABLE `reviews`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `booking_id` (`booking_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Индексы таблицы `rooms`
+--
+ALTER TABLE `rooms`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `login` (`login`);
+
+--
+-- AUTO_INCREMENT для сохранённых таблиц
+--
+
+--
+-- AUTO_INCREMENT для таблицы `bookings`
+--
+ALTER TABLE `bookings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT для таблицы `reviews`
+--
+ALTER TABLE `reviews`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `rooms`
+--
+ALTER TABLE `rooms`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT для таблицы `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- Ограничения внешнего ключа сохраненных таблиц
+--
+
+--
+-- Ограничения внешнего ключа таблицы `bookings`
+--
+ALTER TABLE `bookings`
+  ADD CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `bookings_ibfk_2` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE CASCADE;
+
+--
+-- Ограничения внешнего ключа таблицы `reviews`
+--
+ALTER TABLE `reviews`
+  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+index.php
+<?php session_start(); ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конференции.РФ</title>
+    <link rel="stylesheet" href="css/style.css?v=<?= time() ?>">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            margin: 0;
+            width: 100%;
+            max-width: 480px;
+        }
+        .logo-block img {
+            max-width: 150px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Логотип -->
+        <div class="logo-block">
+            <img src="img/etazhi-logotip-vektor-48.jpg" alt="Логотип Конференции.РФ">
+        </div>
+
+        <h1>Конференции.<span class="highlight">РФ</span></h1>
+        <p class="subtitle">Бронирование помещений для конференций</p>
+        
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <a href="login.php" class="btn" style="flex:1;">Вход</a>
+            <a href="register.php" class="btn btn-secondary" style="flex:1;">Регистрация</a>
+        </div>
+        
+        <div class="auth-links">
+            <span style="color:#6c757d; font-size:12px; font-weight:300;">Администратор: <strong>Admin26</strong> / <strong>Demo20</strong></span>
+        </div>
+    </div>
+</body>
+</html>
+
+
+login.php
+<?php
+require_once 'config/database.php';
+session_start();
+
+$error = '';
+
+if ($_POST) {
+    $login = trim($_POST['login']);
+    $password = $_POST['password'];
+    
+    $user = $db->findUser($login);
+    
+    if (!$user) {
+        $error = 'Пользователь не найден';
+    } elseif ($user['password'] !== $password) {
+        $error = 'Неверный пароль';
+    } else {
+        $_SESSION['user'] = $user;
+        header('Location: ' . ($user['role'] === 'admin' ? 'admin.php' : 'profile.php'));
+        exit;
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход</title>
+    <link rel="stylesheet" href="css/style.css?v=<?= time() ?>">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #FFFFFF;
+        }
+        .container {
+            margin: 0;
+            width: 100%;
+            max-width: 420px;
+        }
+        .logo-block img {
+            max-width: 120px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Логотип -->
+        <div class="logo-block">
+            <img src="img/etazhi-logotip-vektor-48.jpg" alt="Логотип">
+        </div>
+
+        <h1>Вход</h1>
+        <p class="subtitle">Войдите в свой аккаунт</p>
+        
+        <?php if ($error): ?>
+            <div class="alert alert-error show"><?= $error ?></div>
+        <?php endif; ?>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>Логин</label>
+                <input type="text" name="login" placeholder="Введите логин" required>
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" name="password" placeholder="Введите пароль" required>
+            </div>
+            <button type="submit" class="btn btn-block">Войти</button>
+        </form>
+        
+        <div class="auth-links">
+            <a href="register.php">Нет аккаунта? Регистрация</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+register.php
+<?php
+require_once 'config/database.php';
+session_start();
+
+$error = $success = '';
+
+if ($_POST) {
+    $login = trim($_POST['login']);
+    $password = $_POST['password'];
+    $full_name = trim($_POST['full_name']);
+    $phone = trim($_POST['phone']);
+    $email = trim($_POST['email']);
+    
+    if (strlen($login) < 6 || !preg_match('/^[A-Za-z0-9]+$/', $login)) {
+        $error = 'Логин: латиница, мин. 6 символов';
+    } elseif (strlen($password) < 8) {
+        $error = 'Пароль: мин. 8 символов';
+    } elseif (strlen($full_name) < 2) {
+        $error = 'Введите ФИО';
+    } elseif (strlen($phone) < 10) {
+        $error = 'Введите телефон';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Введите email';
+    } elseif ($db->findUser($login)) {
+        $error = 'Логин занят';
+    } else {
+        $db->createUser(compact('login','password','full_name','phone','email'));
+        $success = 'Регистрация успешна!';
+        header('Refresh: 2; url=login.php');
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="css/style.css?v=<?= time() ?>">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #FFFFFF;
+        }
+        .container {
+            margin: 0;
+            width: 100%;
+            max-width: 420px;
+        }
+        .logo-block img {
+            max-width: 120px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Логотип -->
+        <div class="logo-block">
+            <img src="img/etazhi-logotip-vektor-48.jpg" alt="Логотип">
+        </div>
+
+        <h1>Регистрация</h1>
+        <p class="subtitle">Создайте новый аккаунт</p>
+        
+        <?php if ($error): ?>
+            <div class="alert alert-error show"><?= $error ?></div>
+        <?php endif; ?>
+        <?php if ($success): ?>
+            <div class="alert alert-success show"><?= $success ?></div>
+        <?php endif; ?>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>Логин *</label>
+                <input type="text" name="login" placeholder="Латиница, мин. 6 символов" required>
+            </div>
+            <div class="form-group">
+                <label>Пароль *</label>
+                <input type="password" name="password" placeholder="Мин. 8 символов" required>
+            </div>
+            <div class="form-group">
+                <label>ФИО *</label>
+                <input type="text" name="full_name" placeholder="Иванов Иван Иванович" required>
+            </div>
+            <div class="form-group">
+                <label>Телефон *</label>
+                <input type="tel" name="phone" placeholder="+7 (999) 999-99-99" required>
+            </div>
+            <div class="form-group">
+                <label>Email *</label>
+                <input type="email" name="email" placeholder="mail@example.ru" required>
+            </div>
+            <button type="submit" class="btn btn-block">Зарегистрироваться</button>
+        </form>
+        
+        <div class="auth-links">
+            <a href="login.php">Уже есть аккаунт? Войти</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+profile.php
+<?php
+require_once 'config/database.php';
+session_start();
+
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$user = $_SESSION['user'];
+$bookings = $db->getBookingsByUser($user['id']);
+
+if ($_POST && isset($_POST['add_review'])) {
+    $db->addReview([
+        'booking_id' => $_POST['booking_id'],
+        'user_id' => $user['id'],
+        'rating' => $_POST['rating'],
+        'comment' => $_POST['comment']
+    ]);
+    header('Location: profile.php');
+    exit;
+}
+
+function statusClass($s) {
+    $map = ['Новая' => 'new', 'Мероприятие назначено' => 'assigned', 'Мероприятие завершено' => 'completed'];
+    return $map[$s] ?? 'new';
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет</title>
+    <link rel="stylesheet" href="css/style.css?v=<?= time() ?>">
+    <style>
+        .logo-block img {
+            max-width: 120px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width:700px;">
+        <!-- Логотип -->
+        <div class="logo-block">
+            <img src="img/etazhi-logotip-vektor-48.jpg" alt="Логотип">
+        </div>
+
+        <div class="flex-between">
+            <h1 style="font-size:30px; margin:0;">Личный кабинет</h1>
+            <a href="logout.php" class="btn btn-danger btn-sm">Выход</a>
+        </div>
+        
+        <div style="margin:16px 0 24px;">
+            <p style="font-size:16px; font-weight:400;"><?= htmlspecialchars($user['full_name']) ?></p>
+            <p class="text-small"><?= htmlspecialchars($user['email']) ?></p>
+        </div>
+        
+        <div id="slider"></div>
+        
+        <h2>Мои заявки</h2>
+        
+        <?php if (empty($bookings)): ?>
+            <div class="card" style="text-align:center; padding:40px;">
+                <p style="color:#6c757d; font-size:16px;">У вас пока нет заявок</p>
+                <a href="booking.php" class="btn" style="margin-top:16px;">Создать заявку</a>
+            </div>
+        <?php else: ?>
+            <?php foreach ($bookings as $b): ?>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Заявка №<?= $b['id'] ?></span>
+                        <span class="status-badge status-<?= statusClass($b['status']) ?>"><?= $b['status'] ?></span>
+                    </div>
+                    <div>
+                        <p><strong>Помещение:</strong> <?= htmlspecialchars($b['room_name']) ?></p>
+                        <p><strong>Дата:</strong> <?= $b['event_date'] ?> в <?= $b['start_time'] ?></p>
+                        <p><strong>Оплата:</strong> <?= $b['payment_method'] ?></p>
+                        
+                        <?php if ($b['status'] === 'Мероприятие завершено' && !$db->hasReview($b['id'], $user['id'])): ?>
+                            <form method="POST" style="margin-top:12px;">
+                                <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
+                                <div class="flex-center">
+                                    <select name="rating" style="width:auto; padding:8px 12px;">
+                                        <option value="5">5</option>
+                                        <option value="4">4</option>
+                                        <option value="3">3</option>
+                                        <option value="2">2</option>
+                                        <option value="1">1</option>
+                                    </select>
+                                    <input type="text" name="comment" placeholder="Ваш отзыв" style="flex:1;" required>
+                                    <button type="submit" name="add_review" class="btn btn-secondary btn-sm">Отзыв</button>
+                                </div>
+                            </form>
+                        <?php elseif ($b['status'] === 'Мероприятие завершено'): ?>
+                            <p style="color:#28A745; margin-top:8px; font-weight:600;">Отзыв оставлен</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        
+        <div class="text-center mt-20">
+            <a href="booking.php" class="btn">Новая заявка</a>
+        </div>
+    </div>
+
+    <script src="js/script.js?v=<?= time() ?>"></script>
+    <script>
+        new Slider('slider', [
+            'img/image (1).jpeg',
+            'img/image (2).jpeg',
+            'img/image (3).jpeg',
+            'img/image (4).jpeg'
+        ]);
+    </script>
+</body>
+</html>
+
+
+
+admin.php
+<?php
+require_once 'config/database.php';
+session_start();
+
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+    header('Location: login.php');
+    exit;
+}
+
+$user = $_SESSION['user'];
+$tab = $_GET['tab'] ?? 'dashboard';
+$bookings = $db->getAllBookings();
+$users = $db->getUsers();
+$rooms = $db->getRooms();
+
+$new = $assigned = $completed = 0;
+foreach ($bookings as $b) {
+    if ($b['status'] === 'Новая') $new++;
+    elseif ($b['status'] === 'Мероприятие назначено') $assigned++;
+    elseif ($b['status'] === 'Мероприятие завершено') $completed++;
+}
+
+if ($_POST) {
+    if (isset($_POST['update_status'])) {
+        $db->updateStatus($_POST['booking_id'], $_POST['status']);
+        header('Location: admin.php?tab=bookings');
+        exit;
+    }
+    if (isset($_POST['add_room'])) {
+        $db->addRoom($_POST['name'], $_POST['type'], $_POST['capacity'], $_POST['price']);
+        header('Location: admin.php?tab=rooms');
+        exit;
+    }
+}
+
+function sClass($s) {
+    $map = ['Новая' => 'new', 'Мероприятие назначено' => 'assigned', 'Мероприятие завершено' => 'completed'];
+    return $map[$s] ?? 'new';
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель</title>
+    <link rel="stylesheet" href="css/style.css?v=<?= time() ?>">
+    <style>
+        .admin-sidebar .logo img {
+            max-width: 80px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <div class="logo">
+                <img src="img/etazhi-logotip-vektor-48.jpg" alt="Логотип">
+                <h1>Конференции</h1>
+                <div class="sub">Панель управления</div>
+            </div>
+            <div class="user-info">
+                <div class="name"><?= htmlspecialchars($user['full_name']) ?></div>
+                <div class="role">Администратор</div>
+            </div>
+            <ul class="admin-nav">
+                <li class="nav-divider">Навигация</li>
+                <li><a href="admin.php?tab=dashboard" class="<?= $tab === 'dashboard' ? 'active' : '' ?>"><span class="icon">◆</span> Панель</a></li>
+                <li><a href="admin.php?tab=bookings" class="<?= $tab === 'bookings' ? 'active' : '' ?>"><span class="icon">◇</span> Заявки <span class="badge"><?= $new ?></span></a></li>
+                <li><a href="admin.php?tab=rooms" class="<?= $tab === 'rooms' ? 'active' : '' ?>"><span class="icon">□</span> Помещения</a></li>
+                <li><a href="admin.php?tab=users" class="<?= $tab === 'users' ? 'active' : '' ?>"><span class="icon">○</span> Пользователи</a></li>
+                <li class="nav-divider">Система</li>
+                <li><a href="logout.php"><span class="icon">╳</span> Выход</a></li>
+            </ul>
+        </aside>
+        
+        <main class="admin-content">
+            <div class="page-header">
+                <h2><?= ['dashboard' => 'Панель управления', 'bookings' => 'Управление заявками', 'rooms' => 'Управление помещениями', 'users' => 'Пользователи'][$tab] ?></h2>
+                <span class="text-small"><?= date('d.m.Y H:i') ?></span>
+            </div>
+            
+            <?php if ($tab === 'dashboard'): ?>
+                <div class="admin-stats">
+                    <div class="stat-card green"><div class="number"><?= count($bookings) ?></div><div class="label">Всего заявок</div></div>
+                    <div class="stat-card"><div class="number"><?= $new ?></div><div class="label">Новые</div></div>
+                    <div class="stat-card"><div class="number"><?= $assigned ?></div><div class="label">Назначено</div></div>
+                    <div class="stat-card"><div class="number"><?= $completed ?></div><div class="label">Завершено</div></div>
+                </div>
+                
+                <h3>Последние заявки</h3>
+                <?php foreach (array_slice($bookings, 0, 5) as $b): ?>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Заявка №<?= $b['id'] ?> — <?= htmlspecialchars($b['user_name']) ?></span>
+                            <span class="status-badge status-<?= sClass($b['status']) ?>"><?= $b['status'] ?></span>
+                        </div>
+                        <div><strong>Помещение:</strong> <?= htmlspecialchars($b['room_name']) ?> | <strong>Дата:</strong> <?= $b['event_date'] ?></div>
+                    </div>
+                <?php endforeach; ?>
+                
+            <?php elseif ($tab === 'bookings'): ?>
+                <div class="admin-filters">
+                    <input type="text" id="search" placeholder="Поиск..." onkeyup="filterTable()">
+                    <select id="statusFilter" onchange="filterTable()">
+                        <option value="all">Все статусы</option>
+                        <option value="Новая">Новая</option>
+                        <option value="Мероприятие назначено">Назначено</option>
+                        <option value="Мероприятие завершено">Завершено</option>
+                    </select>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table" id="bookingsTable">
+                        <thead><tr><th>ID</th><th>Пользователь</th><th>Помещение</th><th>Дата</th><th>Статус</th><th>Действия</th></tr></thead>
+                        <tbody>
+                            <?php foreach ($bookings as $b): ?>
+                                <tr data-status="<?= $b['status'] ?>">
+                                    <td>#<?= $b['id'] ?></td>
+                                    <td><?= htmlspecialchars($b['user_name']) ?></td>
+                                    <td><?= htmlspecialchars($b['room_name']) ?></td>
+                                    <td><?= $b['event_date'] ?></td>
+                                    <td><span class="status-badge status-<?= sClass($b['status']) ?>"><?= $b['status'] ?></span></td>
+                                    <td>
+                                        <form method="POST" style="display:flex; gap:6px; flex-wrap:wrap;">
+                                            <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
+                                            <select name="status" style="width:auto; padding:4px 8px; font-size:13px;">
+                                                <option value="Новая" <?= $b['status'] === 'Новая' ? 'selected' : '' ?>>Новая</option>
+                                                <option value="Мероприятие назначено" <?= $b['status'] === 'Мероприятие назначено' ? 'selected' : '' ?>>Назначено</option>
+                                                <option value="Мероприятие завершено" <?= $b['status'] === 'Мероприятие завершено' ? 'selected' : '' ?>>Завершено</option>
+                                            </select>
+                                            <button type="submit" name="update_status" class="btn btn-secondary btn-sm">Обновить</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                
+            <?php elseif ($tab === 'rooms'): ?>
+                <div class="card" style="margin-bottom:24px;">
+                    <h3>Добавить помещение</h3>
+                    <form method="POST" style="display:flex; gap:12px; flex-wrap:wrap; align-items:end;">
+                        <div class="form-group" style="margin:0; flex:2; min-width:140px;">
+                            <label style="font-size:13px; font-weight:400;">Название</label>
+                            <input type="text" name="name" placeholder="Название" required style="padding:8px 12px;">
+                        </div>
+                        <div class="form-group" style="margin:0; flex:1; min-width:100px;">
+                            <label style="font-size:13px; font-weight:400;">Тип</label>
+                            <select name="type" required style="padding:8px 12px;">
+                                <option value="аудитория">Аудитория</option>
+                                <option value="коворкинг">Коворкинг</option>
+                                <option value="кинозал">Кинозал</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin:0; flex:0 0 90px;">
+                            <label style="font-size:13px; font-weight:400;">Вместимость</label>
+                            <input type="number" name="capacity" placeholder="50" required style="padding:8px 12px;">
+                        </div>
+                        <div class="form-group" style="margin:0; flex:0 0 110px;">
+                            <label style="font-size:13px; font-weight:400;">Цена (руб.)</label>
+                            <input type="number" name="price" placeholder="30000" required style="padding:8px 12px;">
+                        </div>
+                        <button type="submit" name="add_room" class="btn">Добавить</button>
+                    </form>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead><tr><th>ID</th><th>Название</th><th>Тип</th><th>Вместимость</th><th>Цена</th></tr></thead>
+                        <tbody>
+                            <?php foreach ($rooms as $r): ?>
+                                <tr>
+                                    <td>#<?= $r['id'] ?></td>
+                                    <td><?= htmlspecialchars($r['name']) ?></td>
+                                    <td><?= $r['type'] ?></td>
+                                    <td><?= $r['capacity'] ?></td>
+                                    <td><?= number_format($r['price'], 0, ',', ' ') ?> ₽</td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                
+            <?php elseif ($tab === 'users'): ?>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead><tr><th>ID</th><th>Логин</th><th>ФИО</th><th>Телефон</th><th>Email</th><th>Роль</th></tr></thead>
+                        <tbody>
+                            <?php foreach ($users as $u): ?>
+                                <tr>
+                                    <td>#<?= $u['id'] ?></td>
+                                    <td><?= htmlspecialchars($u['login']) ?></td>
+                                    <td><?= htmlspecialchars($u['full_name']) ?></td>
+                                    <td><?= htmlspecialchars($u['phone']) ?></td>
+                                    <td><?= htmlspecialchars($u['email']) ?></td>
+                                    <td><span class="status-badge <?= $u['role'] === 'admin' ? 'status-assigned' : 'status-new' ?>"><?= $u['role'] === 'admin' ? 'Админ' : 'Пользователь' ?></span></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </main>
+    </div>
+
+    <script>
+    function filterTable() {
+        const search = document.getElementById('search').value.toLowerCase();
+        const status = document.getElementById('statusFilter').value;
+        document.querySelectorAll('#bookingsTable tbody tr').forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const s = row.dataset.status;
+            row.style.display = (search && !text.includes(search) || status !== 'all' && s !== status) ? 'none' : '';
+        });
+    }
+    </script>
+</body>
+</html>
+
+
+booking.php
+<?php
+require_once 'config/database.php';
+session_start();
+
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$rooms = $db->getRooms();
+$error = $success = '';
+
+if ($_POST) {
+    $room_id = $_POST['room_id'];
+    $event_date = $_POST['event_date'];
+    $start_time = $_POST['start_time'];
+    $payment_method = $_POST['payment_method'];
+    
+    if (!$room_id || !$event_date || !$start_time || !$payment_method) {
+        $error = 'Заполните все поля';
+    } else {
+        $db->createBooking([
+            'user_id' => $_SESSION['user']['id'],
+            'room_id' => $room_id,
+            'event_date' => $event_date,
+            'start_time' => $start_time,
+            'payment_method' => $payment_method
+        ]);
+        $success = 'Заявка создана!';
+        header('Refresh: 2; url=profile.php');
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новая заявка</title>
+    <link rel="stylesheet" href="css/style.css?v=<?= time() ?>">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #FFFFFF;
+        }
+        .container {
+            margin: 0;
+            width: 100%;
+            max-width: 480px;
+        }
+        .logo-block img {
+            max-width: 100px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Логотип -->
+        <div class="logo-block">
+            <img src="img/etazhi-logotip-vektor-48.jpg" alt="Логотип">
+        </div>
+
+        <div class="flex-between">
+            <h1 style="font-size:24px; margin:0;">Новая заявка</h1>
+            <a href="profile.php" class="btn btn-outline btn-sm">Назад</a>
+        </div>
+        
+        <?php if ($error): ?>
+            <div class="alert alert-error show"><?= $error ?></div>
+        <?php endif; ?>
+        <?php if ($success): ?>
+            <div class="alert alert-success show"><?= $success ?></div>
+        <?php endif; ?>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>Помещение *</label>
+                <select name="room_id" required>
+                    <option value="">Выберите помещение</option>
+                    <?php foreach ($rooms as $r): ?>
+                        <option value="<?= $r['id'] ?>"><?= $r['name'] ?> (<?= $r['type'] ?>)</option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Дата *</label>
+                <input type="date" name="event_date" min="<?= date('Y-m-d') ?>" required>
+            </div>
+            <div class="form-group">
+                <label>Время *</label>
+                <input type="time" name="start_time" required>
+            </div>
+            <div class="form-group">
+                <label>Оплата *</label>
+                <select name="payment_method" required>
+                    <option value="">Выберите способ</option>
+                    <option value="Наличные">Наличные</option>
+                    <option value="Банковская карта">Банковская карта</option>
+                    <option value="Безналичный расчет">Безналичный расчет</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-block">Отправить заявку</button>
+        </form>
+    </div>
+</body>
+</html>
